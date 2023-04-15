@@ -16,7 +16,13 @@ class CommentController extends Controller
      */
     public function index()
     {
-        $items = Comment::whereNull('parent_id')->latest()->get();
+        if (\request()->session()->has('brand_id')){
+            $items = Comment::whereNull('parent_id')->latest()->where('brand_id', \request()->session()->get('brand_id'))->get();
+        }elseif (Auth::user()->brand_id) {
+            $items = Comment::whereNull('parent_id')->latest()->where('brand_id', Auth::user()->brand_id)->get();
+        }else {
+            $items = Comment::whereNull('parent_id')->latest()->get();
+        }
 
         return view('base::comment.index', compact('items'));
     }
